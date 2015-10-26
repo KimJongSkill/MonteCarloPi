@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include <thread>
+#include <chrono>
 #include <docopt.h>
 
 const std::string Documentation =
@@ -25,7 +26,10 @@ int main(int argc, char* argv[])
 	const std::size_t Threads = Arguments["--threads"].asBool() ? std::stoull(Arguments["COUNT"].asString()) : std::thread::hardware_concurrency();
 	Simulation Sim;
 
+	auto Start = std::chrono::steady_clock::now();
 	auto Result = Sim(Rounds, Threads);
-	
-	std::cout << "Completed " << Rounds << " rounds\nHits: " << Result.first << "\nPi approximated as " << Result.second << '\n';
+	auto End = std::chrono::steady_clock::now();
+
+	std::cout << "Completed " << Rounds << " rounds in " << std::chrono::duration_cast<std::chrono::milliseconds>(End - Start).count() 
+		<< " ms\nHits: " << Result.first << "\nPi approximated as " << Result.second << '\n';
 }
