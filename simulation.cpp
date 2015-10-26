@@ -5,24 +5,58 @@
 #include <cmath>
 #include <vector>
 #include <future>
+#include <functional>
 
-Simulation::Simulation()
+Simulation::Simulation() : Wrapper(TrueEngine)
 {
-	std::mt19937_64::result_type Seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	seed_type Seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
 	MasterEngine.seed(Seed);
 }
 
-std::intmax_t Simulation::Task(std::intmax_t Rounds, std::mt19937_64::result_type Seed)
+Simulation::TrueEngineWrapper::TrueEngineWrapper(bpl::crypt::IvyRNG Object) : Engine(Object) {};
+
+std::uint64_t Simulation::TrueEngineWrapper::operator()()
 {
-	std::mt19937_64 Engine;
+	std::uint64_t Value;
+	Engine(Value);
+
+	return Value;
+}
+
+constexpr std::uint64_t Simulation::TrueEngineWrapper::min()
+{
+	return std::numeric_limits<std::uint64_t>::min();
+}
+
+constexpr std::uint64_t Simulation::TrueEngineWrapper::max()
+{
+	return std::numeric_limits<std::uint64_t>::max();
+}
+
+Simulation::seed_type Simulation::GetSeed()
+{
+	return TrueEngine.SupportsRDRAND() ? 0 : IntDistribution(MasterEngine);
+}
+
+double Simulation::GetReal(prng_type& Fallback)
+{
+	if (TrueEngine.SupportsRDRAND())
+		return RealDistribution(Wrapper);
+	else
+		return RealDistribution(Fallback);
+}
+
+std::intmax_t Simulation::Task(std::intmax_t Rounds, seed_type Seed)
+{
+	prng_type Engine;
 	Engine.seed(Seed);
 	std::intmax_t Hits = 0;
 
 	while (Rounds--)
 	{
-		const double x = Distribution(Engine);
-		const double y = Distribution(Engine);
+		const double x = GetReal(Engine);
+		const double y = GetReal(Engine);
 
 		if (std::sqrt(x * x + y * y) <= 1.0)
 			++Hits;
@@ -33,7 +67,6 @@ std::intmax_t Simulation::Task(std::intmax_t Rounds, std::mt19937_64::result_typ
 
 std::pair<std::intmax_t, double> Simulation::operator()(std::intmax_t Rounds, std::size_t Threads)
 {
-	std::uniform_int_distribution<std::mt19937_64::result_type> IntDistribution;
 	std::intmax_t TotalHits = 0;
 
 	if (Threads > 1)
@@ -43,16 +76,16 @@ std::pair<std::intmax_t, double> Simulation::operator()(std::intmax_t Rounds, st
 
 		std::vector<std::future<std::intmax_t>> Futures;
 		while (Threads--)
-			Futures.push_back(std::async(&Simulation::Task, this, RoundsPerThread, IntDistribution(MasterEngine)));
+			Futures.push_back(std::async(&Simulation::Task, this, RoundsPerThread, GetSeed()));
 		
-		TotalHits += Task(RoundsLeft, IntDistribution(MasterEngine));
+		TotalHits += Task(RoundsLeft, GetSeed());
 
 		for (auto& Future : Futures)
 			TotalHits += Future.get();
 	}
 	else
 	{
-		TotalHits = Task(Rounds, IntDistribution(MasterEngine));
+		TotalHits = Task(Rounds, GetSeed());
 	}
 
 	return { TotalHits, 4.0 * TotalHits / Rounds };
