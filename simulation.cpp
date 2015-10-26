@@ -11,7 +11,7 @@ Simulation::Simulation()
 	Engine.seed(Seed);
 }
 
-double Simulation::operator()(std::intmax_t Rounds)
+std::pair<std::intmax_t, double> Simulation::operator()(std::intmax_t Rounds)
 {
 	std::intmax_t Hits = 0;
 	const std::intmax_t Total = Rounds;
@@ -25,5 +25,5 @@ double Simulation::operator()(std::intmax_t Rounds)
 			++Hits;
 	}
 
-	return 4.0 * Hits / Total;
+	return { Hits, 4.0 * Hits / Total };
 };

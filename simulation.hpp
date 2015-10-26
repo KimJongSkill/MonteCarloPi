@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <random>
+#include <utility>
 
 class Simulation
 {
@@ -11,5 +12,5 @@ class Simulation
 public:
 	Simulation();
 
-	double operator()(std::intmax_t Rounds);
+	std::pair<std::intmax_t, double> operator()(std::intmax_t Rounds);
 };

@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MonteCarloPi", "MonteCarloPi.vcxproj", "{1D04FAF6-4A12-4256-B3F6-A72656BF0BBF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9} = {C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "docopt_s", "..\..\..\..\Source\Repos\docopt.cpp\docopt_s.vcxproj", "{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +26,14 @@ Global
 		{1D04FAF6-4A12-4256-B3F6-A72656BF0BBF}.Release|x64.Build.0 = Release|x64
 		{1D04FAF6-4A12-4256-B3F6-A72656BF0BBF}.Release|x86.ActiveCfg = Release|Win32
 		{1D04FAF6-4A12-4256-B3F6-A72656BF0BBF}.Release|x86.Build.0 = Release|Win32
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}.Debug|x64.ActiveCfg = Debug|x64
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}.Debug|x64.Build.0 = Debug|x64
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}.Debug|x86.ActiveCfg = Debug|Win32
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}.Debug|x86.Build.0 = Debug|Win32
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}.Release|x64.ActiveCfg = Release|x64
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}.Release|x64.Build.0 = Release|x64
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}.Release|x86.ActiveCfg = Release|Win32
+		{C3D3E9FF-7949-44B9-ABE5-3B4C9ACAC0A9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
