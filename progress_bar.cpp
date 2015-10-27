@@ -13,8 +13,7 @@ void ProgressBar::Draw()
 	int Percent = Percentage.load(std::memory_order_acquire);
 	int Progress = std::abs(Percentage) / 10 <= 10 ? std::abs(Percentage) / 10 : 10;
 
-	std::cout << std::setfill('-') << std::setw(10) << std::left;
-	std::cout << std::string(Progress, '#');
+	std::cout << std::setw(10) << std::string(Progress, '#');
 
 	std::cout << "] ";
 
@@ -26,6 +25,9 @@ void ProgressBar::Draw()
 
 void ProgressBar::Service()
 {
+	auto PreviousFill = std::cout.fill('-');
+	std::cout << std::left;
+	
 	do
 	{
 		Draw();
@@ -34,6 +36,9 @@ void ProgressBar::Service()
 
 	Draw();
 	std::cout.put('\n');
+
+	std::cout.fill(PreviousFill);
+	std::cout << std::right;
 }
 
 std::thread ProgressBar::StartService()
