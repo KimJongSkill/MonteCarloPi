@@ -49,14 +49,15 @@ double Simulation::GetReal(prng_type& Fallback)
 
 std::intmax_t Simulation::Task(std::intmax_t Rounds, seed_type Seed)
 {
-	prng_type Engine;
-	Engine.seed(Seed);
+	std::unique_ptr<prng_type> Engine;
+	if (!TrueEngine.SupportsRDRAND())
+		Engine = std::make_unique<prng_type>(GetSeed());
 	std::intmax_t Hits = 0;
 
 	while (Rounds--)
 	{
-		const double x = GetReal(Engine);
-		const double y = GetReal(Engine);
+		const double x = GetReal(*Engine);
+		const double y = GetReal(*Engine);
 
 		if (std::sqrt(x * x + y * y) <= 1.0)
 			++Hits;
