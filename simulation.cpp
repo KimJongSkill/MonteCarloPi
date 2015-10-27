@@ -5,7 +5,7 @@
 #include <vector>
 #include <future>
 
-Simulation::Simulation() : IntDistribution(std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max())
+Simulation::Simulation(ProgressBar& Progress) : Bar(Progress), IntDistribution(std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max())
 {
 	seed_type Seed = static_cast<seed_type>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
@@ -32,20 +32,25 @@ Simulation::seed_type Simulation::GetSeed()
 	return TrueEngine.SupportsRDRAND() ? 0 : MasterEngine();
 }
 
-std::intmax_t Simulation::Task(std::intmax_t Rounds, seed_type Seed)
+std::intmax_t Simulation::Task(std::intmax_t Rounds, seed_type Seed, int PercentageAllocated)
 {
 	std::unique_ptr<prng_type> Engine;
 	if (!TrueEngine.SupportsRDRAND())
 		Engine = std::make_unique<prng_type>(Seed);
 	std::intmax_t Hits = 0;
 
-	while (Rounds--)
+	for (int i = 0; i < PercentageAllocated; ++i)
 	{
-		const std::uint_fast64_t x = GetInt(*Engine);
-		const std::uint_fast64_t y = GetInt(*Engine);
+		for (int j = 0; j < Rounds / PercentageAllocated; ++j)
+		{
+			const std::uint_fast64_t x = GetInt(*Engine);
+			const std::uint_fast64_t y = GetInt(*Engine);
 
-		if (std::sqrt(x * x + y * y) <= std::numeric_limits<uint16_t>::max())
-			++Hits;
+			if (std::sqrt(x * x + y * y) <= std::numeric_limits<uint16_t>::max())
+				++Hits;
+		}
+		
+		Bar.Update(1);
 	}
 
 	return Hits;
@@ -59,19 +64,20 @@ std::pair<std::intmax_t, double> Simulation::operator()(std::intmax_t Rounds, st
 	{
 		const std::intmax_t RoundsPerThread = Rounds / Threads;
 		const std::intmax_t RoundsLeft = Rounds - RoundsPerThread * Threads;
+		const int PercentagePerThread = 100 / Threads;
 
 		std::vector<std::future<std::intmax_t>> Futures;
 		while (Threads--)
-			Futures.push_back(std::async(&Simulation::Task, this, RoundsPerThread, GetSeed()));
+			Futures.push_back(std::async(&Simulation::Task, this, RoundsPerThread, GetSeed(), PercentagePerThread));
 		
-		TotalHits += Task(RoundsLeft, GetSeed());
+		TotalHits += Task(RoundsLeft, GetSeed(), RoundsLeft / Rounds * 100);
 
 		for (auto& Future : Futures)
 			TotalHits += Future.get();
 	}
 	else
 	{
-		TotalHits = Task(Rounds, GetSeed());
+		TotalHits = Task(Rounds, GetSeed(), 100 / Threads);
 	}
 
 	return { TotalHits, 4.0 * TotalHits / Rounds };

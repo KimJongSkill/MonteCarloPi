@@ -1,5 +1,7 @@
 #pragma once
 
+#include "progress_bar.hpp"
+
 #include <cstdint>
 #include <random>
 #include <utility>
@@ -15,13 +17,15 @@ class Simulation
 	prng_type MasterEngine;
 	const std::uniform_int_distribution<seed_type> IntDistribution;
 
+	ProgressBar& Bar;
+
 	seed_type GetSeed();
 	std::uint16_t GetInt(prng_type& Fallback);
 
-	std::intmax_t Task(std::intmax_t Rounds, seed_type Seed);
+	std::intmax_t Task(std::intmax_t Rounds, seed_type Seed, int PercentageAllocated);
 
 public:
-	Simulation();
+	explicit Simulation(ProgressBar& Progress);
 
 	std::pair<std::intmax_t, double> operator()(std::intmax_t Rounds, std::size_t Threads);
 };

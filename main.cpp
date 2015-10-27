@@ -1,4 +1,5 @@
 #include "simulation.hpp"
+#include "progress_bar.hpp"
 
 #include <iostream>
 #include <cstdint>
@@ -24,11 +25,17 @@ int main(int argc, char* argv[])
 	
 	const std::intmax_t Rounds = std::stoll(Arguments["<rounds>"].asString());
 	const std::size_t Threads = Arguments["--threads"].asBool() ? std::stoull(Arguments["COUNT"].asString()) : std::thread::hardware_concurrency();
-	Simulation Sim;
+
+	ProgressBar Bar("Calculating...", R"(|/-\)");
+	auto ProgressThread = Bar.StartService();
+
+	Simulation Sim(Bar);
 
 	auto Start = std::chrono::steady_clock::now();
 	auto Result = Sim(Rounds, Threads);
 	auto End = std::chrono::steady_clock::now();
+
+	ProgressThread.join();
 
 	std::cout << "Completed " << Rounds << " rounds in " << std::chrono::duration_cast<std::chrono::milliseconds>(End - Start).count() 
 		<< " ms\nHits: " << Result.first << "\nPi approximated as " << Result.second << '\n';
