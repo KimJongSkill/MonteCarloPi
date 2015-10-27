@@ -1,28 +1,19 @@
 #pragma once
 
 #include "progress_bar.hpp"
+#include "rng.hpp"
 
 #include <cstdint>
-#include <random>
 #include <utility>
-#include <limits>
+#include <memory>
 #include <Baked Potatoes\Crypt.hpp>
 
 class Simulation
 {
-	typedef std::mt19937 prng_type;
-	typedef std::mt19937::result_type seed_type;
-
-	bpl::crypt::IvyRNG TrueEngine;
-	prng_type MasterEngine;
-	const std::uniform_int_distribution<seed_type> IntDistribution;
-
+	std::unique_ptr<BaseRNG> Engine = BaseRNG::New();
 	ProgressBar& Bar;
 
-	seed_type GetSeed();
-	std::uint16_t GetInt(prng_type& Fallback);
-
-	std::intmax_t Task(std::intmax_t Rounds, seed_type Seed, int PercentageAllocated);
+	std::intmax_t Task(std::intmax_t Rounds, int PercentageAllocated);
 
 public:
 	explicit Simulation(ProgressBar& Progress);

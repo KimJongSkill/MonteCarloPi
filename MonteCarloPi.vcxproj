@@ -164,10 +164,12 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="progress_bar.cpp" />
+    <ClCompile Include="rng.cpp" />
     <ClCompile Include="simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="progress_bar.hpp" />
+    <ClInclude Include="rng.hpp" />
     <ClInclude Include="simulation.hpp" />
   </ItemGroup>
   <ItemGroup>

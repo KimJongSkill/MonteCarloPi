@@ -24,12 +24,18 @@
     <ClCompile Include="progress_bar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rng.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="simulation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="progress_bar.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rng.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
