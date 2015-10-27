@@ -1,11 +1,9 @@
 #include "simulation.hpp"
 
-#include <iostream>
 #include <chrono>
 #include <cmath>
 #include <vector>
 #include <future>
-#include <functional>
 
 Simulation::Simulation() : IntDistribution(std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max())
 {
