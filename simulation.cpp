@@ -7,44 +7,31 @@
 #include <future>
 #include <functional>
 
-Simulation::Simulation() : Wrapper(TrueEngine)
+Simulation::Simulation() : IntDistribution(std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max())
 {
-	seed_type Seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	seed_type Seed = static_cast<seed_type>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
 	MasterEngine.seed(Seed);
 }
 
-Simulation::TrueEngineWrapper::TrueEngineWrapper(bpl::crypt::IvyRNG Object) : Engine(Object) {};
-
-std::uint64_t Simulation::TrueEngineWrapper::operator()()
+std::uint16_t Simulation::GetInt(prng_type& Fallback)
 {
-	std::uint64_t Value;
-	Engine(Value);
+	if (TrueEngine.SupportsRDRAND())
+	{
+		uint16_t Value;
+		TrueEngine(Value);
 
-	return Value;
-}
-
-constexpr std::uint64_t Simulation::TrueEngineWrapper::min()
-{
-	return std::numeric_limits<std::uint64_t>::min();
-}
-
-constexpr std::uint64_t Simulation::TrueEngineWrapper::max()
-{
-	return std::numeric_limits<std::uint64_t>::max();
+		return Value;
+	}
+	else
+	{
+		return IntDistribution(Fallback);
+	}
 }
 
 Simulation::seed_type Simulation::GetSeed()
 {
-	return TrueEngine.SupportsRDRAND() ? 0 : IntDistribution(MasterEngine);
-}
-
-double Simulation::GetReal(prng_type& Fallback)
-{
-	if (TrueEngine.SupportsRDRAND())
-		return RealDistribution(Wrapper);
-	else
-		return RealDistribution(Fallback);
+	return TrueEngine.SupportsRDRAND() ? 0 : MasterEngine();
 }
 
 std::intmax_t Simulation::Task(std::intmax_t Rounds, seed_type Seed)
@@ -56,10 +43,10 @@ std::intmax_t Simulation::Task(std::intmax_t Rounds, seed_type Seed)
 
 	while (Rounds--)
 	{
-		const double x = GetReal(*Engine);
-		const double y = GetReal(*Engine);
+		const std::uint_fast64_t x = GetInt(*Engine);
+		const std::uint_fast64_t y = GetInt(*Engine);
 
-		if (std::sqrt(x * x + y * y) <= 1.0)
+		if (std::sqrt(x * x + y * y) <= std::numeric_limits<uint16_t>::max())
 			++Hits;
 	}
 
