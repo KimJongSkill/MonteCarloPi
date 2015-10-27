@@ -10,8 +10,9 @@ void ProgressBar::Draw(bool UpdateAnimation)
 {
 	std::cout << String << " [";
 
-	int Percent = Percentage.load(std::memory_order_acquire);
-	int Progress = std::abs(Percentage) / 10 <= 10 ? std::abs(Percentage) / 10 : 10;
+	// Attempt to work with any value Percentage may hold
+	int Percent = std::abs(Percentage.load(std::memory_order_acquire));
+	int Progress = Percent / 10 <= 10 ? Percent / 10 : 10;
 
 	std::cout << std::setw(10) << std::string(Progress, '#');
 
