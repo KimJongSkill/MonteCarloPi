@@ -6,7 +6,7 @@
 
 ProgressBar::ProgressBar(std::string Message, std::string Spinner) : String(Message), Animation(Spinner) {}
 
-void ProgressBar::Draw()
+void ProgressBar::Draw(bool UpdateAnimation)
 {
 	std::cout << String << " [";
 
@@ -17,8 +17,16 @@ void ProgressBar::Draw()
 
 	std::cout << "] ";
 
-	std::cout << Animation[AnimationState];
-	AnimationState = (AnimationState + 1) % Animation.length();
+	if (UpdateAnimation)
+	{
+		std::cout << Animation[AnimationState];
+		AnimationState = (AnimationState + 1) % Animation.length();
+	}
+	else
+	{
+		// Clear the previous animation frame
+		std::cout.put(' ');
+	}
 
 	std::cout.put('\r');
 }
@@ -34,7 +42,7 @@ void ProgressBar::Service()
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	} while (Percentage != 100);
 
-	Draw();
+	Draw(false);
 	std::cout.put('\n');
 
 	std::cout.fill(PreviousFill);

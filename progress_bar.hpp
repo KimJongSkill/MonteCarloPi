@@ -11,7 +11,7 @@ class ProgressBar
 	std::string Animation;
 	std::string::size_type AnimationState = 0;
 	
-	void Draw();
+	void Draw(bool UpdateAnimation = true);
 	void Service();
 
 public:
