@@ -51,7 +51,7 @@ std::intmax_t Simulation::Task(std::intmax_t Rounds, seed_type Seed)
 {
 	std::unique_ptr<prng_type> Engine;
 	if (!TrueEngine.SupportsRDRAND())
-		Engine = std::make_unique<prng_type>(GetSeed());
+		Engine = std::make_unique<prng_type>(Seed);
 	std::intmax_t Hits = 0;
 
 	while (Rounds--)
