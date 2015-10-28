@@ -6,25 +6,46 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <iostream>
+#include <map>
 #include <docopt.h>
 
 const std::string Documentation =
-R"(
-Monte Carlo Pi
+R"(Monte Carlo Pi
 
     Usage:
-        mcpi <rounds> [--threads COUNT] 
+        mcpi <rounds> [--threads=<n>] 
 
     Options:
-        -t, --threads  Run simulation with COUNT threads
+        -t, --threads=<n>  Run simulation with n threads
 )";
 
 int main(int argc, char* argv[])
 {
-	auto Arguments = docopt::docopt(Documentation, { std::next(argv), std::next(argv, argc) }, true);
-	
-	const std::intmax_t Rounds = std::stoll(Arguments["<rounds>"].asString());
-	const std::size_t Threads = Arguments["--threads"].asBool() ? std::stoull(Arguments["COUNT"].asString()) : std::thread::hardware_concurrency();
+	if (argc < 2)
+	{
+		std::cout << Documentation;
+
+		return EXIT_FAILURE;
+	}
+
+	std::map<std::string, docopt::value> Arguments;
+	std::intmax_t Rounds;
+	std::size_t Threads;
+	try
+	{
+		Arguments = docopt::docopt(Documentation, { std::next(argv), std::next(argv, argc) }, true);
+
+		Rounds = std::stoll(Arguments["<rounds>"].asString());
+		Threads = Arguments["--threads"].isString() ? std::stoull(Arguments["--threads"].asString()) : std::thread::hardware_concurrency();
+	}
+	catch (const std::exception& Exception)
+	{
+		std::cout << "[EXCEPTION] " << Exception.what() << '\n';
+		std::cout << Documentation;
+		
+		return EXIT_FAILURE;
+	}
 
 	ProgressBar Bar("Calculating...", R"(|/-\)");
 	auto ProgressThread = Bar.StartService();
