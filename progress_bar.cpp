@@ -58,7 +58,7 @@ std::thread ProgressBar::StartService()
 {
 	auto Thread = std::thread(&ProgressBar::Service, this);
 
-	return std::move(Thread);
+	return Thread;
 }
 
 int ProgressBar::Update(int Delta)
