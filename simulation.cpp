@@ -49,7 +49,7 @@ std::pair<std::intmax_t, double> Simulation::operator()(std::intmax_t Rounds, st
 	}
 	else
 	{
-		TotalHits = Task(Rounds, 100 / Threads);
+		TotalHits = Task(Rounds, 100);
 	}
 
 	return { TotalHits, 4.0 * TotalHits / Rounds };
