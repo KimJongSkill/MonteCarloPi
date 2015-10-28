@@ -11,7 +11,9 @@ void ProgressBar::Draw(bool UpdateAnimation)
 	std::cout << String << " [";
 
 	// Attempt to work with any value Percentage may hold
-	int Percent = std::abs(Percentage.load(std::memory_order_acquire));
+	std::unique_lock<std::mutex> Lock(Mutex);
+	int Percent = std::abs(Percentage);
+	Lock.unlock();
 	int Progress = Percent / 10 <= 10 ? Percent / 10 : 10;
 
 	std::cout << std::setw(10) << std::string(Progress, '#');
@@ -37,14 +39,16 @@ void ProgressBar::Service()
 	auto PreviousFill = std::cout.fill('-');
 	std::cout << std::left;
 	
-	do
+	while (Percentage != 100)
 	{
 		Draw();
-		std::this_thread::sleep_for(std::chrono::milliseconds(250));
-	} while (Percentage != 100);
+
+		std::unique_lock<std::mutex> Lock(Mutex);
+		Flag.wait_for(Lock, std::chrono::milliseconds(250));
+	};
 
 	Draw(false);
-	std::cout.put('\n');
+	std::cout.put('\n'); 
 
 	std::cout.fill(PreviousFill);
 	std::cout << std::right;
@@ -59,5 +63,11 @@ std::thread ProgressBar::StartService()
 
 int ProgressBar::Update(int Delta)
 {
-	return Percentage.fetch_add(Delta, std::memory_order_release);
+	std::lock_guard<std::mutex> Lock(Mutex);
+	Percentage += Delta;
+
+	if (Percentage == 100)
+		Flag.notify_all();
+
+	return Percentage;
 }

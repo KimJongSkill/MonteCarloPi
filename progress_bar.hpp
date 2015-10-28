@@ -1,15 +1,18 @@
 #pragma once
 
 #include <string>
-#include <atomic>
 #include <thread>
+#include <condition_variable>
+#include <mutex>
 
 class ProgressBar
 {
 	std::string String;
-	std::atomic_int Percentage = 0;
+	int Percentage = 0;
 	std::string Animation;
 	std::string::size_type AnimationState = 0;
+	std::mutex Mutex;
+	std::condition_variable Flag;
 	
 	void Draw(bool UpdateAnimation = true);
 	void Service();
