@@ -54,9 +54,7 @@ void ProgressBar::Service()
 
 std::thread ProgressBar::StartService()
 {
-	auto Thread = std::thread(&ProgressBar::Service, this);
-
-	return Thread;
+	return std::thread(&ProgressBar::Service, this);
 }
 
 int ProgressBar::Get()
