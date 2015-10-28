@@ -21,5 +21,6 @@ public:
 	ProgressBar(std::string Message, std::string Spinner);
 	
 	std::thread StartService();
-	int Update(int Delta);
+	int Get();
+	void Update(int Delta);
 };

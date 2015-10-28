@@ -11,9 +11,7 @@ void ProgressBar::Draw(bool UpdateAnimation)
 	std::cout << String << " [";
 
 	// Attempt to work with any value Percentage may hold
-	std::unique_lock<std::mutex> Lock(Mutex);
-	int Percent = std::abs(Percentage);
-	Lock.unlock();
+	int Percent = std::abs(Get());
 	int Progress = Percent / 10 <= 10 ? Percent / 10 : 10;
 
 	std::cout << std::setw(10) << std::string(Progress, '#');
@@ -48,7 +46,7 @@ void ProgressBar::Service()
 	};
 
 	Draw(false);
-	std::cout.put('\n'); 
+	std::cout.put('\n');
 
 	std::cout.fill(PreviousFill);
 	std::cout << std::right;
@@ -61,13 +59,17 @@ std::thread ProgressBar::StartService()
 	return Thread;
 }
 
-int ProgressBar::Update(int Delta)
+int ProgressBar::Get()
+{
+	std::lock_guard<std::mutex> Lock(Mutex);
+	return Percentage;
+}
+
+void ProgressBar::Update(int Delta)
 {
 	std::lock_guard<std::mutex> Lock(Mutex);
 	Percentage += Delta;
 
 	if (Percentage == 100)
 		Flag.notify_all();
-
-	return Percentage;
 }
