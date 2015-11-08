@@ -3,12 +3,16 @@
 #include <chrono>
 #include <limits>
 
-std::uint16_t HardwareRNG::GetInt()
+std::pair<std::uint_fast64_t, std::uint_fast64_t> HardwareRNG::GetPair()
 {
-	std::uint16_t Value;
-	Engine(Value);
+	union
+	{
+		std::uint16_t Short[2];
+		std::uint32_t Long;
+	} Values;
+	Engine(Values.Long);
 
-	return Value;
+	return { Values.Short[0], Values.Short[1] };
 }
 
 std::unique_ptr<BaseRNG> HardwareRNG::NewLocalInstance()
@@ -26,9 +30,9 @@ std::unique_ptr<BaseRNG> BaseRNG::New()
 
 SoftwareRNG::SoftwareRNG(result_type Seed) : Engine(Seed), Distribution(std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max()) {};
 
-std::uint16_t SoftwareRNG::GetInt()
+std::pair<std::uint_fast64_t, std::uint_fast64_t> SoftwareRNG::GetPair()
 {
-	return Distribution(Engine);
+	return { Distribution(Engine), Distribution(Engine) };
 }
 
 std::unique_ptr<BaseRNG> SoftwareRNG::NewLocalInstance()

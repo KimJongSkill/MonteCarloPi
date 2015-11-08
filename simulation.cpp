@@ -3,22 +3,22 @@
 #include <cmath>
 #include <vector>
 #include <future>
+#include <utility>
 
 Simulation::Simulation(ProgressBar& Progress) : Bar(Progress) {};
 
 std::intmax_t Simulation::Task(std::intmax_t Rounds, int PercentageAllocated)
 {
-	auto LocalEngine = Engine->NewLocalInstance();
+	const auto LocalEngine = Engine->NewLocalInstance();
 	std::intmax_t Hits = 0;
 
 	for (int i = 0; i < PercentageAllocated; ++i)
 	{
 		for (int j = 0; j < Rounds / PercentageAllocated; ++j)
 		{
-			const std::uint_fast64_t x = LocalEngine->GetInt();
-			const std::uint_fast64_t y = LocalEngine->GetInt();
+			const std::pair<std::uint_fast64_t, std::uint_fast64_t> Values = LocalEngine->GetPair();
 
-			if (std::sqrt(x * x + y * y) <= std::numeric_limits<uint16_t>::max())
+			if (std::sqrt(Values.first * Values.first + Values.second * Values.second) <= std::numeric_limits<uint16_t>::max())
 				++Hits;
 		}
 		

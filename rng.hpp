@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <random>
 #include <memory>
+#include <utility>
 #include <Baked Potatoes\Crypt.hpp>
 
 class BaseRNG
@@ -15,7 +16,7 @@ public:
 	BaseRNG() = default;
 	virtual ~BaseRNG() = default;
 
-	virtual std::uint16_t GetInt() = 0;
+	virtual std::pair<std::uint_fast64_t, std::uint_fast64_t> GetPair() = 0;
 	virtual std::unique_ptr<BaseRNG> NewLocalInstance() = 0;
 
 	static std::unique_ptr<BaseRNG> New();
@@ -29,7 +30,7 @@ public:
 	HardwareRNG() = default;
 	~HardwareRNG() override = default;
 
-	std::uint16_t GetInt() override;
+	std::pair<std::uint_fast64_t, std::uint_fast64_t> GetPair() override;
 	std::unique_ptr<BaseRNG> NewLocalInstance() override;
 };
 
@@ -42,6 +43,6 @@ public:
 	explicit SoftwareRNG(result_type Seed);
 	~SoftwareRNG() override = default;
 
-	std::uint16_t GetInt() override;
+	std::pair<std::uint_fast64_t, std::uint_fast64_t> GetPair() override;
 	std::unique_ptr<BaseRNG> NewLocalInstance() override;
 };
