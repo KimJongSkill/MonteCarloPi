@@ -5,6 +5,11 @@
 #include <future>
 #include <utility>
 
+static inline double Pythagoras(std::uint_fast64_t a, std::uint_fast64_t b)
+{
+	return std::sqrt(a * a + b * b);
+}
+
 Simulation::Simulation(ProgressBar& Progress) : Bar(Progress) {};
 
 std::intmax_t Simulation::Task(std::intmax_t Rounds, int PercentageAllocated)
@@ -16,9 +21,9 @@ std::intmax_t Simulation::Task(std::intmax_t Rounds, int PercentageAllocated)
 	{
 		for (int j = 0; j < Rounds / PercentageAllocated; ++j)
 		{
-			const std::pair<std::uint_fast64_t, std::uint_fast64_t> Values = LocalEngine->GetPair();
+			const auto Values = LocalEngine->GetPair();
 
-			if (std::sqrt(Values.first * Values.first + Values.second * Values.second) <= std::numeric_limits<uint16_t>::max())
+			if (Pythagoras(Values.first, Values.second) <= std::numeric_limits<uint16_t>::max())
 				++Hits;
 		}
 		
