@@ -37,7 +37,7 @@ void ProgressBar::Service()
 	auto PreviousFill = std::cout.fill('-');
 	std::cout << std::left;
 	
-	while (Percentage != 100)
+	while (Get() != 100)
 	{
 		Draw();
 
