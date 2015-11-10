@@ -14,9 +14,10 @@ const std::string Documentation =
 R"(Monte Carlo Pi
 
     Usage:
-        mcpi <rounds> [--threads=<n>] 
+        mcpi <rounds> [--software --threads=<n>]
 
     Options:
+        -s, --software     Disable hardware acceleration for random number generation
         -t, --threads=<n>  Run simulation with n threads
 )";
 
@@ -50,7 +51,7 @@ int main(int argc, char* argv[])
 	ProgressBar Bar("Calculating...", R"(|/-\)");
 	auto ProgressThread = Bar.StartService();
 
-	Simulation Sim(Bar);
+	Simulation Sim(Bar, Arguments["--software"].asBool());
 
 	auto Start = std::chrono::steady_clock::now();
 	auto Result = Sim(Rounds, Threads);

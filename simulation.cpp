@@ -10,7 +10,13 @@ static inline double Pythagoras(std::uint_fast64_t a, std::uint_fast64_t b)
 	return std::sqrt(a * a + b * b);
 }
 
-Simulation::Simulation(ProgressBar& Progress) : Bar(Progress) {};
+Simulation::Simulation(ProgressBar& Progress, bool NoHardware) : Bar(Progress)
+{
+	if (NoHardware)
+		Engine = BaseRNG::New(rng::force_software);
+	else
+		Engine = BaseRNG::New(rng::auto_select);
+};
 
 std::intmax_t Simulation::Task(std::intmax_t Rounds, int PercentageAllocated)
 {

@@ -6,6 +6,13 @@
 #include <utility>
 #include <Baked Potatoes\Crypt.hpp>
 
+namespace rng
+{
+	constexpr struct auto_select_t {} auto_select;
+	constexpr struct force_software_t {} force_software;
+	constexpr struct force_hardware_t {} force_hardware;
+}
+
 class BaseRNG
 {
 protected:
@@ -19,7 +26,9 @@ public:
 	virtual std::pair<std::uint_fast64_t, std::uint_fast64_t> GetPair() = 0;
 	virtual std::unique_ptr<BaseRNG> NewLocalInstance() = 0;
 
-	static std::unique_ptr<BaseRNG> New();
+	static std::unique_ptr<BaseRNG> New(rng::auto_select_t);
+	static std::unique_ptr<BaseRNG> New(rng::force_software_t);
+	static std::unique_ptr<BaseRNG> New(rng::force_hardware_t);
 };
 
 class HardwareRNG : public BaseRNG
