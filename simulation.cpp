@@ -57,5 +57,7 @@ std::pair<std::intmax_t, double> Simulation::operator()(std::intmax_t Rounds, st
 		TotalHits = Task(Rounds, 100);
 	}
 
+	Bar.Set(100);
+
 	return { TotalHits, 4.0 * TotalHits / Rounds };
 }

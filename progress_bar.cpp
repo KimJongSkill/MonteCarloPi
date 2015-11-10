@@ -71,3 +71,12 @@ void ProgressBar::Update(int Delta)
 	if (Percentage == 100)
 		Flag.notify_all();
 }
+
+void ProgressBar::Set(int Value)
+{
+	std::lock_guard<std::mutex> Lock(Mutex);
+	Percentage = Value;
+
+	if (Percentage == 100)
+		Flag.notify_all();
+}

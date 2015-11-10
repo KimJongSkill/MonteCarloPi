@@ -23,4 +23,5 @@ public:
 	std::thread StartService();
 	int Get();
 	void Update(int Delta);
+	void Set(int Value);
 };
