@@ -3,21 +3,28 @@
 #include <chrono>
 #include <limits>
 
+HardwareRNG::HardwareRNG()
+{
+	Engine(Buffer.begin(), Buffer.end());
+}
+
 std::pair<std::uint_fast64_t, std::uint_fast64_t> HardwareRNG::GetPair()
 {
-	union
-	{
-		std::uint16_t Short[2];
-		std::uint32_t Long;
-	} Values;
-	Engine(Values.Long);
+	std::pair<std::uint_fast64_t, std::uint_fast64_t> Pair = { Buffer[Index], Buffer[Index + 1] };
+	Index += 2;
 
-	return { Values.Short[0], Values.Short[1] };
+	if (Index >= Buffer.size())
+	{
+		Engine(Buffer.begin(), Buffer.end());
+		Index = 0;
+	}
+
+	return Pair;
 }
 
 std::unique_ptr<BaseRNG> HardwareRNG::NewLocalInstance()
 {
-	return std::make_unique<HardwareRNG>(*this);
+	return std::make_unique<HardwareRNG>();
 }
 
 std::unique_ptr<BaseRNG> BaseRNG::New(rng::auto_select_t)

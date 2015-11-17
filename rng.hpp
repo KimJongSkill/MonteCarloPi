@@ -4,6 +4,7 @@
 #include <random>
 #include <memory>
 #include <utility>
+#include <array>
 #include <Baked Potatoes\Crypt.hpp>
 
 namespace rng
@@ -34,9 +35,11 @@ public:
 class HardwareRNG : public BaseRNG
 {
 	bpl::crypt::IvyRNG Engine;
+	std::array<std::uint16_t, 2048> Buffer;
+	std::array<std::uint16_t, 2048>::size_type Index = 0;
 
 public:
-	HardwareRNG() = default;
+	HardwareRNG();
 	~HardwareRNG() override = default;
 
 	std::pair<std::uint_fast64_t, std::uint_fast64_t> GetPair() override;
