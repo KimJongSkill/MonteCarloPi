@@ -8,6 +8,7 @@
 #include <chrono>
 #include <iostream>
 #include <map>
+#include <type_traits>
 #include <docopt.h>
 
 const std::string Documentation =
@@ -20,6 +21,33 @@ R"(Monte Carlo Pi
         -s, --software     Disable hardware acceleration for random number generation
         -t, --threads=<n>  Run simulation with n threads
 )";
+
+template <class T>
+std::string FormatInteger(T Number)
+{
+	static_assert(std::is_integral<T>::value, "Type is not an integer");
+
+	std::string String = std::to_string(Number);
+	std::string Buffer;
+	/*
+	*	Reserve space to avoid reallocations
+	*	Remember that for every 3 characters
+	*	we are inserting a comma
+	*/
+	Buffer.reserve(String.length() + String.length() / 3);
+
+	int i = String.length() - 3;
+	while (i > 0)
+	{
+		Buffer.insert(0, String, i, 3);
+		Buffer.insert(Buffer.begin(), ',');
+
+		i -= 3;
+	}
+	Buffer.insert(0, String, 0, 3 - 1);
+
+	return Buffer;
+}
 
 int main(int argc, char* argv[])
 {
@@ -61,8 +89,8 @@ int main(int argc, char* argv[])
 
 	auto TimeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(End - Start).count();
 
-	std::cout << "Completed " << Rounds << " rounds in " << TimeTaken  << " ms"
-		"[" << (Rounds / TimeTaken) * 1000 << " rounds per second]\n"
-		"Hits: " << Result.first << "\n"
-		"Pi approximated as " << Result.second << '\n';
+	std::cout << "Completed " << FormatInteger(Rounds) << " rounds in " << TimeTaken  << " ms"
+		" [" << FormatInteger((Rounds / TimeTaken) * 1000) << " rounds per second]\n"
+		"Hits: " << FormatInteger(Result.first) << "\n"
+		"Pi approximated as " << (Result.second) << '\n';
 }
