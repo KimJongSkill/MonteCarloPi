@@ -59,6 +59,10 @@ int main(int argc, char* argv[])
 
 	ProgressThread.join();
 
-	std::cout << "Completed " << Rounds << " rounds in " << std::chrono::duration_cast<std::chrono::milliseconds>(End - Start).count() 
-		<< " ms\nHits: " << Result.first << "\nPi approximated as " << Result.second << '\n';
+	auto TimeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(End - Start).count();
+
+	std::cout << "Completed " << Rounds << " rounds in " << TimeTaken  << " ms"
+		"[" << (Rounds / TimeTaken) * 1000 << " rounds per second]\n"
+		"Hits: " << Result.first << "\n"
+		"Pi approximated as " << Result.second << '\n';
 }
